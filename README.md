@@ -1,5 +1,10 @@
 # cloud-netconfig
 
+[![CI](https://github.com/ssahani/cloud-netconfig/workflows/CI/badge.svg)](https://github.com/ssahani/cloud-netconfig/actions/workflows/ci.yml)
+[![Security Audit](https://github.com/ssahani/cloud-netconfig/workflows/Security%20Audit/badge.svg)](https://github.com/ssahani/cloud-netconfig/actions/workflows/security-audit.yml)
+[![License: LGPL-3.0-or-later](https://img.shields.io/badge/License-LGPL%203.0--or--later-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Release](https://img.shields.io/github/v/release/ssahani/cloud-netconfig)](https://github.com/ssahani/cloud-netconfig/releases)
+
 **Automatic network configuration for cloud instances**
 
 `cloud-netconfig` automatically configures network interfaces in cloud environments by fetching metadata from cloud provider APIs (Azure IMDS, AWS EC2 IMDS, GCP Metadata Service). It handles secondary IP addresses, routing tables, and policy-based routing for multi-interface cloud instances.
@@ -24,7 +29,7 @@
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Clone repository
-git clone https://github.com/your-org/cloud-netconfig.git
+git clone https://github.com/ssahani/cloud-netconfig.git
 cd cloud-netconfig
 
 # Build

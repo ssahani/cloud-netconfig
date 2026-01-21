@@ -1,0 +1,123 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Get version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+          body: |
+            ## cloud-netconfig ${{ steps.get_version.outputs.version }}
+
+            ### Installation
+
+            ```bash
+            # Download binaries
+            wget https://github.com/ssahani/cloud-netconfig/releases/download/${{ github.ref_name }}/cloud-netconfig-linux-x86_64.tar.gz
+            tar xzf cloud-netconfig-linux-x86_64.tar.gz
+
+            # Install
+            sudo install cloud-netconfigd /usr/bin/
+            sudo install cnctl /usr/bin/
+
+            # Create user
+            sudo useradd -M -s /usr/bin/nologin cloud-network
+
+            # Install config and service
+            sudo mkdir -p /etc/cloud-network
+            wget https://raw.githubusercontent.com/ssahani/cloud-netconfig/${{ github.ref_name }}/distribution/config/cloud-network.yaml
+            sudo mv cloud-network.yaml /etc/cloud-network/
+
+            wget https://raw.githubusercontent.com/ssahani/cloud-netconfig/${{ github.ref_name }}/distribution/systemd/cloud-netconfigd.service
+            sudo mv cloud-netconfigd.service /lib/systemd/system/
+
+            # Enable and start
+            sudo systemctl daemon-reload
+            sudo systemctl enable --now cloud-netconfigd
+            ```
+
+            ### Changes
+
+            See [CHANGELOG.md](https://github.com/ssahani/cloud-netconfig/blob/main/CHANGELOG.md) for details.
+
+  build-release:
+    name: Build Release
+    needs: create-release
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
+          - aarch64-unknown-linux-gnu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Create archive
+        run: |
+          mkdir -p release
+          cp target/${{ matrix.target }}/release/cloud-netconfigd release/
+          cp target/${{ matrix.target }}/release/cnctl release/
+          cp LICENSE.txt release/
+          cp README.md release/
+          tar czf cloud-netconfig-${{ matrix.target }}.tar.gz -C release .
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./cloud-netconfig-${{ matrix.target }}.tar.gz
+          asset_name: cloud-netconfig-${{ matrix.target }}.tar.gz
+          asset_content_type: application/gzip
+
+  publish-crate:
+    name: Publish to crates.io
+    needs: build-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish
+        run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
+        continue-on-error: true
