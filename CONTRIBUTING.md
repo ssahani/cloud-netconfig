@@ -85,10 +85,10 @@ cargo build --release
 
 # Create test config
 mkdir -p /tmp/cloud-network
-cp distribution/config/cloud-network.yaml /tmp/cloud-network/
+cp distribution/etc/cloud-network/config.yaml /tmp/cloud-network/
 
 # Run (requires root for network operations)
-sudo target/release/cloud-netconfigd --config /tmp/cloud-network/cloud-network.yaml
+sudo target/release/cloud-netconfigd --config /tmp/cloud-network/config.yaml
 ```
 
 ## Coding Standards
@@ -155,7 +155,7 @@ To add support for a new cloud provider:
    ```
 3. **Add detection logic**: Update `src/cloud/mod.rs`
 4. **Add configuration**: Update `src/conf/mod.rs`
-5. **Add example config**: Create `distribution/config/examples/newprovider.yaml`
+5. **Add example config**: Create `distribution/etc/cloud-network/examples/newprovider.yaml`
 6. **Update README**: Add provider to supported cloud providers table
 7. **Add tests**: Create tests for metadata parsing and network configuration
 
@@ -178,8 +178,11 @@ cloud-netconfig/
 │   ├── system/                  # System operations (users, capabilities)
 │   └── web/                     # HTTP utilities
 ├── distribution/                # Distribution files
-│   ├── config/                  # Configuration examples
-│   └── systemd/                 # Systemd unit files
+│   ├── etc/cloud-network/       # Configuration files
+│   ├── lib/systemd/system/      # Systemd unit files
+│   ├── usr/share/               # Shell completions
+│   ├── scripts/                 # Install/uninstall scripts
+│   └── packages/                # Package templates (deb, rpm, arch)
 └── tests/                       # Integration tests
 ```
 

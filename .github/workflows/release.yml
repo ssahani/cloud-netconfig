@@ -50,10 +50,10 @@ jobs:
 
             # Install config and service
             sudo mkdir -p /etc/cloud-network
-            wget https://raw.githubusercontent.com/ssahani/cloud-netconfig/${{ github.ref_name }}/distribution/config/cloud-network.yaml
-            sudo mv cloud-network.yaml /etc/cloud-network/
+            wget https://raw.githubusercontent.com/ssahani/cloud-netconfig/${{ github.ref_name }}/distribution/etc/cloud-network/config.yaml
+            sudo mv config.yaml /etc/cloud-network/
 
-            wget https://raw.githubusercontent.com/ssahani/cloud-netconfig/${{ github.ref_name }}/distribution/systemd/cloud-netconfigd.service
+            wget https://raw.githubusercontent.com/ssahani/cloud-netconfig/${{ github.ref_name }}/distribution/lib/systemd/system/cloud-netconfigd.service
             sudo mv cloud-netconfigd.service /lib/systemd/system/
 
             # Enable and start

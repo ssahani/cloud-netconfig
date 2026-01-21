@@ -33,14 +33,25 @@ build:
 
 .PHONY: install
 install:
-	install bin/cloud-netconfigd /usr/bin/
-	install bin/cnctl /usr/bin
+	# Binaries
+	install -v -m 0755 bin/cloud-netconfigd /usr/bin/
+	install -v -m 0755 bin/cnctl /usr/bin/
 
-	install -vdm 755 /etc/cloud-network
-	install -m 644 distribution/config/cloud-network.yaml /etc/cloud-network/
+	# Configuration
+	install -v -d -m 0755 /etc/cloud-network
+	install -v -m 0644 distribution/etc/cloud-network/config.yaml /etc/cloud-network/
 
-	install -m 0644 distribution/systemd/cloud-netconfigd.service /lib/systemd/system/
+	# Systemd service
+	install -v -m 0644 distribution/lib/systemd/system/cloud-netconfigd.service /lib/systemd/system/
 	systemctl daemon-reload
+
+	# Shell completions
+	install -v -d -m 0755 /usr/share/bash-completion/completions
+	install -v -m 0644 distribution/usr/share/bash-completion/completions/cnctl /usr/share/bash-completion/completions/
+	install -v -d -m 0755 /usr/share/zsh/site-functions
+	install -v -m 0644 distribution/usr/share/zsh/site-functions/_cnctl /usr/share/zsh/site-functions/
+	install -v -d -m 0755 /usr/share/fish/vendor_completions.d
+	install -v -m 0644 distribution/usr/share/fish/vendor_completions.d/cnctl.fish /usr/share/fish/vendor_completions.d/
 
 PHONY: clean
 clean:

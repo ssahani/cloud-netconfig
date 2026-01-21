@@ -1,0 +1,26 @@
+#!/bin/sh
+# SPDX-License-Identifier: LGPL-3.0-or-later
+set -e
+
+case "$1" in
+    purge)
+        # Remove user
+        if getent passwd cloud-network >/dev/null; then
+            deluser --system cloud-network || true
+        fi
+
+        # Remove state directory
+        rm -rf /var/lib/cloud-netconfig
+
+        # Remove systemd service
+        systemctl daemon-reload || true
+        ;;
+
+    remove)
+        systemctl daemon-reload || true
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

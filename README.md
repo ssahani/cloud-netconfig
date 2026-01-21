@@ -89,7 +89,7 @@ network:
 
 ### Full Configuration Options
 
-See [distribution/cloud-network.yaml](distribution/cloud-network.yaml) for a complete annotated example with all available options.
+See [distribution/etc/cloud-network/config.yaml](distribution/etc/cloud-network/config.yaml) for a complete annotated example with all available options.
 
 #### Logging Section
 
