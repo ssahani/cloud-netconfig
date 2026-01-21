@@ -37,9 +37,9 @@ install:
 	install bin/cnctl /usr/bin
 
 	install -vdm 755 /etc/cloud-network
-	install -m 644 distribution/cloud-network.yaml /etc/cloud-network
+	install -m 644 distribution/config/cloud-network.yaml /etc/cloud-network/
 
-	install -m 0644 distribution/cloud-netconfigd.service /lib/systemd/system/
+	install -m 0644 distribution/systemd/cloud-netconfigd.service /lib/systemd/system/
 	systemctl daemon-reload
 
 PHONY: clean
